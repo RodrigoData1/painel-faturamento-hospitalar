@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Gestão Hospitalar - Maternidade Cândido Mariano</title>
+    <!-- Chart.js para Renderização Gráfica -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts para Tipografia Limpa -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #0F172A;          /* Azul escuro profundo (Fundo) */
+            --bg-card: #1E293B;          /* Azul acinzentado (Cards) */
+            --bg-input: #334155;         /* Inputs/Filtros */
+            --text-main: #F8FAFC;        /* Branco puro (Títulos) */
+            --text-muted: #94A3B8;       /* Cinza azulado (Subtítulos) */
+            --border-glow: #334155;      /* Linhas divisórias sutis */
+            
+            /* Paleta Neon de Destaque */
+            --neon-cyan: #38BDF8;        /* Informação Principal */
+            --neon-purple: #A855F7;      /* Procedimentos/Cirúrgico */
+            --neon-green: #10B981;       /* Taxas/Sucesso */
+            --neon-coral: #F43F5E;       /* Alertas/Críticos */
+            --neon-amber: #F59E0B;       /* Atenção */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1650px;
+            margin: 0 auto;
+        }
+
+        /* Header Executivo Moderno */
+        header {
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            padding: 28px 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--neon-cyan);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .badge-gov {
+            background: linear-gradient(135deg, var(--neon-cyan) 0%, #0284C7 100%);
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #0F172A;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Barra de Filtros */
+        .filter-bar {
+            background: var(--bg-card);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-glow);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            background: var(--bg-input);
+            border: 1px solid #475569;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Mosaico de KPIs Metálicos/Neon */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-glow);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--kpi-color, var(--neon-cyan));
+            box-shadow: 0 0 12px var(--kpi-color, var(--neon-cyan));
+        }
+
+        .kpi-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .kpi-meta {
+            font-size: 11px;
+            margin-top: 8px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Grid de Dashboards */
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 1200px) {
+            .row-2col { grid-template-columns: 1.1fr 0.9fr; }
+            .row-3col { grid-template-columns: repeat(3, 1fr); }
+            .row-mixed { grid-template-columns: 1.3fr 0.7fr; }
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-glow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+
+        .chart-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            flex-grow: 1;
+            min-height: 300px;
+        }
+
+        /* Tabelas Customizadas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 14px 10px;
+            border-bottom: 2px solid var(--border-glow);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 16px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #E2E8F0;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Data Bars Futuristas */
+        .databar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .databar-track {
+            flex-grow: 1;
+            background: #334155;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            max-width: 1200px;
+        }
+
+        .databar-fill {
+            background: linear-gradient(90deg, #0284C7, var(--neon-cyan));
+            height: 100%;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+        }
+
+        /* Matriz de Calor Corrigida e com Alto Contraste */
+        .heatmap-table th {
+            text-align: center;
+        }
+        .heatmap-table th:first-child {
+            text-align: left;
+        }
+        .heatmap-table td {
+            text-align: center;
+        }
+        .heatmap-table td:first-child {
+            text-align: left;
+        }
+
+        .heatmap-cell {
+            font-weight: 800 !important;
+            color: #000000 !important; /* Texto preto absoluto para legibilidade total */
+            border-radius: 6px;
+            padding: 8px 12px !important;
+            display: inline-block;
+            min-width: 75px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        /* Crachás Dinâmicos */
+        .table-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- HEADER OFICIAL -->
+        <header>
+            <div>
+                <h1>Maternidade Cândido Mariano</h1>
+                <p>Monitoramento Estratégico & Faturamento de AIH</p>
+            </div>
+            <div class="badge-gov">SUS</div>
+        </header>
+
+        <!-- BARRA DE FILTROS DINÂMICOS -->
+        <div class="filter-bar">
+            <span class="filter-label">Filtros Ativos:</span>
+            <select class="filter-select" id="anoSlicer" onchange="atualizarHistoricoAnual()">
+                <option value="todos">Histórico Integrado (2023 - 2025)</option>
+                <option value="2023">Exercício Financeiro 2023</option>
+                <option value="2024">Exercício Financeiro 2024</option>
+                <option value="2025">Exercício Financeiro 2025</option>
+            </select>
+        </div>
+
+        <!-- CARDS DE METRICAS (KPI) -->
+        <div class="kpi-grid">
+            <div class="kpi-card" style="--kpi-color: var(--neon-cyan);">
+                <div class="kpi-title">Nascimentos Consolidados</div>
+                <div class="kpi-value" id="kpi-nasc" style="color: var(--neon-cyan);">10.396</div>
+                <div class="kpi-meta">Soma histórica do triênio avaliado</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color: var(--neon-purple);">
+                <div class="kpi-title">Procedimentos de Laqueadura</div>
+                <div class="kpi-value" id="kpi-laq" style="color: var(--neon-purple);">2.651</div>
+                <div class="kpi-meta">Cirurgias reprodutivas realizadas</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color: var(--neon-green);">
+                <div class="kpi-title">Taxa Média de Laqueaduras</div>
+                <div class="kpi-value" id="kpi-taxa" style="color: var(--neon-green);">25,50%</div>
+                <div class="kpi-meta">Proporção em relação ao volume de partos</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color: var(--neon-coral);">
+                <div class="kpi-title">Tempo Médio de Internação</div>
+                <div class="kpi-value" style="color: var(--neon-coral);">4,3 <span style="font-size: 16px; color: var(--text-muted);">dias</span></div>
+                <div class="kpi-meta">Média global de permanência hospitalar</div>
+            </div>
+        </div>
+
+        <!-- LINHA 1: HISTÓRICO ASSISTENCIAL E RANKING -->
+        <div class="dashboard-row row-mixed">
+            <!-- Gráfico Dinâmico Evolutivo -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Evolução de Nascimentos e Cirurgias Preventivas</div>
+                    <div class="chart-subtitle">Correlação direta entre partos executados e laqueaduras tubárias fixadas</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chartEvolucao"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabela Executiva com Micrográficos -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Top Hospitais por Faturamento de AIH</div>
+                    <div class="chart-subtitle">Concentração do volume financeiro no 1T26</div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Unidade Hospitalar (CNES)</th>
+                                <th>Produção</th>
+                                <th>Quota (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>0009717 SANTA CASA</strong></td>
+                                <td style="color: var(--neon-cyan); font-weight: 700;">8.039</td>
+                                <td>
+                                    <div class="databar-container">
+                                        <div class="databar-track"><div class="databar-fill" style="width: 42.2%;"></div></div>
+                                        <span style="font-weight:600;">42,20%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>0009725 HOSP REGIONAL DE MS</td>
+                                <td>3.838</td>
+                                <td>
+                                    <div class="databar-container">
+                                        <div class="databar-track"><div class="databar-fill" style="width: 20.15%; background: #0284C7;"></div></div>
+                                        <span>20,15%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>0009709 HOSP UNIV MARIA APARECIDA</td>
+                                <td>2.732</td>
+                                <td>
+                                    <div class="databar-container">
+                                        <div class="databar-track"><div class="databar-fill" style="width: 14.34%; background: #0284C7;"></div></div>
+                                        <span>14,34%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>0009768 MATERNIDADE AAMI</td>
+                                <td>1.879</td>
+                                <td>
+                                    <div class="databar-container">
+                                        <div class="databar-track"><div class="databar-fill" style="width: 9.86%; background: #475569;"></div></div>
+                                        <span>9,86%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>0009733 HOSPITAL SAO JULIAO</td>
+                                <td>1.854</td>
+                                <td>
+                                    <div class="databar-container">
+                                        <div class="databar-track"><div class="databar-fill" style="width: 9.73%; background: #475569;"></div></div>
+                                        <span>9,73%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- LINHA 2: AUDITORIA DE REJEIÇÕES E CARÁTER OPERACIONAL -->
+        <div class="dashboard-row row-2col">
+            <!-- Bloqueios Clínicos e Auditoria -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Auditoria de Glosas: Motivos de Rejeição de AIH</div>
+                    <div class="chart-subtitle">Mapeamento de inconformidades cadastrais e clínicas no 1T26</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 20px; align-items: center; height: 100%;">
+                    <div class="chart-wrapper" style="min-height: 220px; max-height: 220px;">
+                        <canvas id="chartGlosas"></canvas>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Causa Detalhada</th>
+                                    <th>Casos</th>
+                                    <th>Ação Indicada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span style="color:var(--neon-coral); margin-right: 6px;">●</span> Prontuário Bloqueado</td>
+                                    <td><strong style="color: var(--neon-coral);">50</strong></td>
+                                    <td><span class="table-badge" style="color:var(--neon-coral); background:rgba(244,63,94,0.15);">Auditoria Física</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="color:var(--neon-amber); margin-right: 6px;">●</span> Períodos Sobrepostos</td>
+                                    <td><strong style="color: var(--neon-amber);">47</strong></td>
+                                    <td><span class="table-badge" style="color:var(--neon-amber); background:rgba(245,158,11,0.15);">Revisão TI</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="color:var(--neon-cyan); margin-right: 6px;">●</span> Exige Habilitação</td>
+                                    <td><strong style="color: var(--neon-cyan);">27</strong></td>
+                                    <td><span class="table-badge" style="color:var(--neon-cyan); background:rgba(56,189,248,0.15);">Credenciamento</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evolução de Demanda Hospitalar -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Perfil de Fluxo: Urgência vs. Atendimentos Eletivos</div>
+                    <div class="chart-subtitle">Análise mensal da sazonalidade regulatória das portas de entrada</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chartFluxo"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- LINHA 3: MATRIZ DE LEITOS, GEOGRAFIA E DEMOGRAFIA ETÁRIA -->
+        <div class="dashboard-row row-3col">
+            <!-- Média de Permanência (CORRIGIDO E OTIMIZADO) -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Média de Permanência por Especialidade</div>
+                    <div class="chart-subtitle">Giro de leito e retenção média em dias</div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="heatmap-table">
+                        <thead>
+                            <tr>
+                                <th>Linha de Leito</th>
+                                <th>AIHs</th>
+                                <th>Média</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Cirúrgico</strong></td>
+                                <td>1.381</td>
+                                <td><span class="heatmap-cell" style="background-color: #22C55E;">1,1 dias</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Obstétricos</strong></td>
+                                <td>3.734</td>
+                                <td><span class="heatmap-cell" style="background-color: #38BDF8;">2,7 dias</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Clínico</strong></td>
+                                <td>841</td>
+                                <td><span class="heatmap-cell" style="background-color: #F59E0B;">3,7 dias</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pediátricos</strong></td>
+                                <td>1.873</td>
+                                <td><span class="heatmap-cell" style="background-color: #F43F5E;">9,6 dias</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Origem Geográfica -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Concentração por Município de Residência</div>
+                    <div class="chart-subtitle">Identificação de pressão de demanda externa (Top 5)</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chartOrigem"></canvas>
+                </div>
+            </div>
+
+            <!-- Perfil Populacional -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Estrutura de Atendimento por Faixa Etária</div>
+                    <div class="chart-subtitle">Gargalos e demandas concentradas por faixa etária</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chartIdade"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE INTELIGÊNCIA DO PAINEL -->
+    <script>
+        // Configurações Globais de Design do Chart.js para combinar com o tema Dark/Neon
+        Chart.defaults.color = '#94A3B8';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.plugins.tooltip.backgroundColor = '#1E293B';
+        Chart.defaults.plugins.tooltip.titleColor = '#F8FAFC';
+        Chart.defaults.plugins.tooltip.bodyColor = '#F8FAFC';
+        Chart.defaults.plugins.tooltip.borderColor = '#334155';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+
+        const dadosAnuais = {
+            todos: { labels: ['2023', '2024', '2025'], partos: [3405, 3389, 3602], laqueaduras: [544, 1076, 1031], taxas: [15.98, 31.75, 28.62], kpiNasc: "10.396", kpiLaq: "2.651", kpiTaxa: "25,50%" },
+            2023: { labels: ['Jan/23', 'Fev/23', 'Mar/23', 'Abr/23', 'Mai/23', 'Jun/23', 'Jul/23', 'Ago/23', 'Set/23', 'Out/23', 'Nov/23', 'Dez/23'], partos: [317, 297, 299, 272, 284, 281, 256, 309, 170, 222, 201, 280], laqueaduras: [53, 28, 37, 32, 45, 41, 51, 61, 52, 49, 45, 50], taxas: [16.7, 9.4, 12.3, 11.7, 15.8, 14.5, 19.9, 19.7, 30.5, 22.0, 22.3, 17.8], kpiNasc: "3.405", kpiLaq: "544", kpiTaxa: "15,98%" },
+            2024: { labels: ['Jan/24', 'Fev/24', 'Mar/24', 'Abr/24', 'Mai/24', 'Jun/24', 'Jul/24', 'Ago/24', 'Set/24', 'Out/24', 'Nov/24', 'Dez/24'], partos: [221, 236, 257, 203, 299, 338, 242, 264, 231, 232, 174, 302], laqueaduras: [68, 77, 69, 49, 59, 96, 69, 119, 118, 84, 126, 142], taxas: [30.7, 32.6, 26.8, 24.1, 19.7, 28.4, 28.5, 45.0, 51.0, 36.2, 72.4, 47.0], kpiNasc: "3.389", kpiLaq: "1.076", kpiTaxa: "31,75%" },
+            2025: { labels: ['Jan/25', 'Fev/25', 'Mar/25', 'Abr/25', 'Mai/25', 'Jun/25', 'Jul/25', 'Ago/25', 'Set/25', 'Out/25', 'Nov/25', 'Dez/25'], partos: [288, 231, 288, 280, 295, 260, 268, 254, 275, 263, 196, 232], laqueaduras: [114, 98, 90, 68, 57, 51, 67, 102, 109, 111, 87, 77], taxas: [39.5, 42.4, 31.2, 24.2, 19.3, 19.6, 25.0, 40.1, 39.6, 42.2, 44.3, 33.1], kpiNasc: "3.602", kpiLaq: "1.031", kpiTaxa: "28,62%" }
+        };
+
+        let graficoEvolucao;
+        const ctxEvol = document.getElementById('chartEvolucao').getContext('2d');
+
+        function criarGraficoEvolutivo(ano) {
+            const dados = dadosAnuais[ano];
+            
+            if (graficoEvolucao) {
+                graficoEvolucao.destroy();
+            }
+
+            graficoEvolucao = new Chart(ctxEvol, {
+                type: 'bar',
+                data: {
+                    labels: dados.labels,
+                    datasets: [
+                        { label: 'Partos Totais', data: dados.partos, backgroundColor: '#0284C7', hoverBackgroundColor: '#38BDF8', order: 2, barPercentage: 0.55, borderRadius: 4 },
+                        { label: 'Laqueaduras Tubárias', data: dados.laqueaduras, backgroundColor: '#A855F7', hoverBackgroundColor: '#C084FC', order: 2, barPercentage: 0.55, borderRadius: 4 },
+                        { label: 'Taxa de Laqueadura (%)', data: dados.taxas, type: 'line', borderColor: '#10B981', backgroundColor: 'transparent', pointBackgroundColor: '#10B981', borderWidth: 3, pointRadius: 5, yAxisID: 'yAxisPercent', order: 1 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        yAxisPercent: { position: 'right', beginAtZero: true, max: 80, grid: { display: false } }
+                    },
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, color: '#F8FAFC' } } }
+                }
+            });
+
+            document.getElementById('kpi-nasc').innerText = dados.kpiNasc;
+            document.getElementById('kpi-laq').innerText = dados.kpiLaq;
+            document.getElementById('kpi-taxa').innerText = dados.kpiTaxa;
+        }
+
+        function atualizarHistoricoAnual() {
+            criarGraficoEvolutivo(document.getElementById('anoSlicer').value);
+        }
+
+        criarGraficoEvolutivo('todos');
+
+        // 3. Gráfico: Rosca Glosas
+        const ctxGlosas = document.getElementById('chartGlosas').getContext('2d');
+        new Chart(ctxGlosas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Prontuário Bloqueado', 'Períodos Sobrepostos', 'Exige Habilitação'],
+                datasets: [{
+                    data: [50, 47, 27],
+                    backgroundColor: ['#F43F5E', '#F59E0B', '#38BDF8'],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // 5. Gráfico: Sazonalidade de Fluxo
+        const ctxFluxo = document.getElementById('chartFluxo').getContext('2d');
+        new Chart(ctxFluxo, {
+            type: 'bar',
+            data: {
+                labels: ['Janeiro', 'Fevereiro', 'Março'],
+                datasets: [
+                    { label: 'Urgência', data: [481, 467, 591], backgroundColor: '#E11D48', borderRadius: 4 },
+                    { label: 'Planejado/Eletivo', data: [127, 103, 110], backgroundColor: '#334155', borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } } },
+                plugins: { legend: { labels: { color: '#F8FAFC' } } }
+            }
+        });
+
+        // 6. Gráfico de Origem Geográfica
+        const ctxOrigem = document.getElementById('chartOrigem').getContext('2d');
+        new Chart(ctxOrigem, {
+            type: 'bar',
+            indexAxis: 'y',
+            data: {
+                labels: ['Campo Grande', 'Sidrolândia', 'Terenos', 'Ribas do Rio Pardo', 'Camapuã'],
+                datasets: [{
+                    data: [1430, 71, 32, 30, 27],
+                    backgroundColor: '#06B6D4',
+                    borderRadius: 4,
+                    barThickness: 14
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { display: false } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // 7. Gráfico de Faixa Etária Atendida
+        const ctxIdade = document.getElementById('chartIdade').getContext('2d');
+        new Chart(ctxIdade, {
+            type: 'bar',
+            indexAxis: 'y',
+            data: {
+                labels: ['25-34 anos', '15-24 anos', '< 1 ano', '35-44 anos', '45-54 anos', '5-14 anos', '55-64 anos'],
+                datasets: [{
+                    data: [586, 546, 446, 235, 50, 9, 7],
+                    backgroundColor: '#6366F1',
+                    borderRadius: 4,
+                    barThickness: 12
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' } }, y: { grid: { display: false } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+</html>
