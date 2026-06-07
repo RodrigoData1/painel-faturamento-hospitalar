@@ -12,7 +12,7 @@
     <style>
         :root {
             --bg-main: #0F172A;          /* Azul escuro profundo (Fundo) */
-            --bg-card: #1E293B;          /* Azul acinzentado (Cards) */
+            --bg-card: #1E293B;          /* Azul acinzetado (Cards) */
             --bg-input: #334155;         /* Inputs/Filtros */
             --text-main: #F8FAFC;        /* Branco puro (Títulos) */
             --text-muted: #94A3B8;       /* Cinza azulado (Subtítulos) */
@@ -36,7 +36,11 @@
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
-            padding: 24px;
+            padding: 16px;
+        }
+
+        @media (min-width: 768px) {
+            body { padding: 24px; }
         }
 
         .container {
@@ -47,25 +51,39 @@
         /* Header Executivo Moderno */
         header {
             background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-            padding: 28px 32px;
+            padding: 20px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             margin-bottom: 24px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
             border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
+        @media (min-width: 768px) {
+            header {
+                padding: 28px 32px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
         header h1 {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.5px;
             color: var(--text-main);
         }
 
+        @media (min-width: 768px) {
+            header h1 { font-size: 26px; }
+        }
+
         header p {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--neon-cyan);
             margin-top: 6px;
             font-weight: 500;
@@ -73,9 +91,9 @@
 
         .badge-gov {
             background: linear-gradient(135deg, var(--neon-cyan) 0%, #0284C7 100%);
-            padding: 8px 24px;
+            padding: 6px 20px;
             border-radius: 30px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             letter-spacing: 1px;
             color: #0F172A;
@@ -85,14 +103,24 @@
         /* Barra de Filtros */
         .filter-bar {
             background: var(--bg-card);
-            padding: 16px 24px;
+            padding: 16px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             border: 1px solid var(--border-glow);
             margin-bottom: 24px;
             display: flex;
-            gap: 16px;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        @media (min-width: 768px) {
+            .filter-bar {
+                padding: 16px 24px;
+                flex-direction: row;
+                gap: 16px;
+                align-items: center;
+            }
         }
 
         .filter-label {
@@ -106,7 +134,7 @@
         .filter-select {
             background: var(--bg-input);
             border: 1px solid #475569;
-            padding: 10px 20px;
+            padding: 10px 16px;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
@@ -114,6 +142,11 @@
             outline: none;
             cursor: pointer;
             transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .filter-select { width: auto; }
         }
 
         .filter-select:hover {
@@ -124,14 +157,14 @@
         /* Mosaico de KPIs Metálicos/Neon */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
             margin-bottom: 24px;
         }
 
         .kpi-card {
             background: var(--bg-card);
-            padding: 24px;
+            padding: 20px;
             border-radius: 14px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             border: 1px solid var(--border-glow);
@@ -156,7 +189,7 @@
         }
 
         .kpi-title {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             font-weight: 700;
             text-transform: uppercase;
@@ -164,16 +197,16 @@
         }
 
         .kpi-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--text-main);
-            margin-top: 10px;
+            margin-top: 8px;
             letter-spacing: -0.5px;
         }
 
         .kpi-meta {
             font-size: 11px;
-            margin-top: 8px;
+            margin-top: 6px;
             color: var(--text-muted);
             font-weight: 500;
         }
@@ -194,20 +227,21 @@
 
         .chart-card {
             background: var(--bg-card);
-            padding: 24px;
+            padding: 20px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             border: 1px solid var(--border-glow);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .chart-header {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .chart-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--text-main);
             letter-spacing: -0.3px;
@@ -216,27 +250,57 @@
         .chart-subtitle {
             font-size: 12px;
             color: var(--text-muted);
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
+        /* Responsividade para manter os gráficos visíveis no celular */
         .chart-wrapper {
             position: relative;
             flex-grow: 1;
-            min-height: 300px;
+            min-height: 260px; 
+            width: 100%;
         }
 
-        /* Tabelas Customizadas */
+        @media (min-width: 768px) {
+            .chart-wrapper {
+                min-height: 320px;
+            }
+        }
+
+        /* Ajuste do container de Glosas para quebrar em linhas no celular */
+        .glosas-container {
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 20px; 
+            align-items: center; 
+            height: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .glosas-container {
+                grid-template-columns: 0.9fr 1.1fr;
+            }
+        }
+
+        /* Tabelas Customizadas e Rolagem Responsiva */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
             text-align: left;
+            min-width: 280px;
         }
 
         th {
             color: var(--text-muted);
             font-weight: 700;
-            padding: 14px 10px;
+            padding: 12px 8px;
             border-bottom: 2px solid var(--border-glow);
             text-transform: uppercase;
             font-size: 11px;
@@ -244,7 +308,7 @@
         }
 
         td {
-            padding: 16px 10px;
+            padding: 14px 8px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             color: #E2E8F0;
             vertical-align: middle;
@@ -258,11 +322,11 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
-        /* Data Bars Futuristas */
+        /* Data Bars */
         .databar-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
         .databar-track {
@@ -271,7 +335,7 @@
             height: 8px;
             border-radius: 4px;
             overflow: hidden;
-            max-width: 1200px;
+            min-width: 50px;
         }
 
         .databar-fill {
@@ -281,7 +345,7 @@
             box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
         }
 
-        /* Matriz de Calor Corrigida e com Alto Contraste */
+        /* Matriz de Calor */
         .heatmap-table th {
             text-align: center;
         }
@@ -297,21 +361,23 @@
 
         .heatmap-cell {
             font-weight: 800 !important;
-            color: #000000 !important; /* Texto preto absoluto para legibilidade total */
+            color: #000000 !important;
             border-radius: 6px;
-            padding: 8px 12px !important;
+            padding: 6px 10px !important;
             display: inline-block;
-            min-width: 75px;
+            min-width: 70px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            font-size: 12px;
         }
 
         /* Crachás Dinâmicos */
         .table-badge {
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -364,7 +430,6 @@
 
         <!-- LINHA 1: HISTÓRICO ASSISTENCIAL E RANKING -->
         <div class="dashboard-row row-mixed">
-            <!-- Gráfico Dinâmico Evolutivo -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">Evolução de Nascimentos e Cirurgias Preventivas</div>
@@ -375,7 +440,6 @@
                 </div>
             </div>
 
-            <!-- Tabela Executiva com Micrográficos -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">Top Hospitais por Faturamento de AIH</div>
@@ -447,16 +511,15 @@
             </div>
         </div>
 
-        <!-- LINHA 2: AUDITORIA DE REJEIÇÕES E CARÁTER OPERACIONAL -->
+        <!-- LINHA 2: AUDITORIA DE REJEIÇÕES (TEXTO CORRIGIDO AQUI) -->
         <div class="dashboard-row row-2col">
-            <!-- Bloqueios Clínicos e Auditoria -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">Auditoria de Glosas: Motivos de Rejeição de AIH</div>
                     <div class="chart-subtitle">Mapeamento de inconformidades cadastrais e clínicas no 1T26</div>
                 </div>
-                <div style="display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 20px; align-items: center; height: 100%;">
-                    <div class="chart-wrapper" style="min-height: 220px; max-height: 220px;">
+                <div class="glosas-container">
+                    <div class="chart-wrapper" style="min-height: 200px; max-height: 220px;">
                         <canvas id="chartGlosas"></canvas>
                     </div>
                     <div class="table-wrapper">
@@ -470,17 +533,18 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><span style="color:var(--neon-coral); margin-right: 6px;">●</span> Prontuário Bloqueado</td>
+                                    <td><span style="color:var(--neon-coral); margin-right: 4px;">●</span> Prontuário Bloqueado</td>
                                     <td><strong style="color: var(--neon-coral);">50</strong></td>
                                     <td><span class="table-badge" style="color:var(--neon-coral); background:rgba(244,63,94,0.15);">Auditoria Física</span></td>
                                 </tr>
                                 <tr>
-                                    <td><span style="color:var(--neon-amber); margin-right: 6px;">●</span> Períodos Sobrepostos</td>
+                                    <td><span style="color:var(--neon-amber); margin-right: 4px;">●</span> Períodos Sobrepostos</td>
                                     <td><strong style="color: var(--neon-amber);">47</strong></td>
+                                    <!-- TEXTO CORRIGIDO: Modificado para "Auditoria Física" -->
                                     <td><span class="table-badge" style="color:var(--neon-amber); background:rgba(245,158,11,0.15);">Auditoria Física</span></td>
                                 </tr>
                                 <tr>
-                                    <td><span style="color:var(--neon-cyan); margin-right: 6px;">●</span> Exige Habilitação</td>
+                                    <td><span style="color:var(--neon-cyan); margin-right: 4px;">●</span> Exige Habilitação</td>
                                     <td><strong style="color: var(--neon-cyan);">27</strong></td>
                                     <td><span class="table-badge" style="color:var(--neon-cyan); background:rgba(56,189,248,0.15);">Credenciamento</span></td>
                                 </tr>
@@ -490,7 +554,6 @@
                 </div>
             </div>
 
-            <!-- Evolução de Demanda Hospitalar -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">Perfil de Fluxo: Urgência vs. Atendimentos Eletivos</div>
@@ -504,7 +567,6 @@
 
         <!-- LINHA 3: MATRIZ DE LEITOS, GEOGRAFIA E DEMOGRAFIA ETÁRIA -->
         <div class="dashboard-row row-3col">
-            <!-- Média de Permanência (CORRIGIDO E OTIMIZADO) -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">Média de Permanência por Especialidade</div>
@@ -545,7 +607,6 @@
                 </div>
             </div>
 
-            <!-- Origem Geográfica -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">Concentração por Município de Residência</div>
@@ -556,7 +617,6 @@
                 </div>
             </div>
 
-            <!-- Perfil Populacional -->
             <div class="chart-card">
                 <div class="chart-header">
                     <div class="chart-title">Estrutura de Atendimento por Faixa Etária</div>
@@ -571,7 +631,6 @@
 
     <!-- SCRIPT DE INTELIGÊNCIA DO PAINEL -->
     <script>
-        // Configurações Globais de Design do Chart.js para combinar com o tema Dark/Neon
         Chart.defaults.color = '#94A3B8';
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.plugins.tooltip.backgroundColor = '#1E293B';
@@ -630,7 +689,7 @@
 
         criarGraficoEvolutivo('todos');
 
-        // 3. Gráfico: Rosca Glosas
+        // Gráfico: Rosca Glosas
         const ctxGlosas = document.getElementById('chartGlosas').getContext('2d');
         new Chart(ctxGlosas, {
             type: 'doughnut',
@@ -651,7 +710,7 @@
             }
         });
 
-        // 5. Gráfico: Sazonalidade de Fluxo
+        // Gráfico: Sazonalidade de Fluxo
         const ctxFluxo = document.getElementById('chartFluxo').getContext('2d');
         new Chart(ctxFluxo, {
             type: 'bar',
@@ -670,7 +729,7 @@
             }
         });
 
-        // 6. Gráfico de Origem Geográfica
+        // Gráfico de Origem Geográfica
         const ctxOrigem = document.getElementById('chartOrigem').getContext('2d');
         new Chart(ctxOrigem, {
             type: 'bar',
@@ -692,7 +751,7 @@
             }
         });
 
-        // 7. Gráfico de Faixa Etária Atendida
+        // Gráfico de Faixa Etária Atendida
         const ctxIdade = document.getElementById('chartIdade').getContext('2d');
         new Chart(ctxIdade, {
             type: 'bar',
